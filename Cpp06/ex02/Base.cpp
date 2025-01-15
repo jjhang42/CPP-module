@@ -1,13 +1,14 @@
 #include "Base.hpp"
 /* empty file */
-# include "A.cpp"
-# include "B.cpp"
-# include "C.cpp"
 
 Base::~Base( void )
 {
 
 }
+
+# include "A.cpp"
+# include "B.cpp"
+# include "C.cpp"
 
 Base	*generate( void )
 {
@@ -31,32 +32,26 @@ void	identify( Base *p )
 		std::cout << "C" << std::endl;
 }
 
-void	identify( Base &p )
+static void	dynamicCastRef( Base &p, int type, std::string const &str )
 {
 	try
 	{
-		(void)dynamic_cast<A &>(p);
-		std::cout << "A" << std::endl;
+		if (type == A_TYPE)
+			(void)dynamic_cast<A &>(p);
+		else if (type == B_TYPE)
+			(void)dynamic_cast<B &>(p);
+		else if (type == C_TYPE)
+			(void)dynamic_cast<C &>(p);
+		std::cout << str << std::endl;
 	}
 	catch(const std::exception& e)
 	{
-		try
-		{
-			(void)dynamic_cast<B &>(p);
-			std::cout << "B" << std::endl;
-		}
-		catch(const std::exception& e)
-		{
-			try
-			{
-				(void)dynamic_cast<C &>(p);
-				std::cout << "C" << std::endl;
-			}
-			catch(const std::exception& e)
-			{
-				std::cout << "failure" << std::endl;
-			}
-			
-		}
 	}
+}
+
+void	identify( Base &p )
+{
+	dynamicCastRef(p, A_TYPE, "A");
+	dynamicCastRef(p, B_TYPE, "B");
+	dynamicCastRef(p, C_TYPE, "C");
 }

@@ -51,7 +51,13 @@ I learn it.
 > what is the 'non'?
 	'non' means 'Not a Number'. float and double datatypes are able to return by undifine behaviar.
 
-## ex01 
+## ex01
 * ex01 chose reinterpret_cast Type, because it was trying to cast a pointer to an integer. THis exersise is basic and easy.
 
 ## ex02
+* ex02 chose dynamic_cast Type, because it can check their addresses, and return value of failures.
+
+> what is the 'RTTI(RunTime Type Information)'
+* RTTI is an abbreviation for RunTime Type Information. This mechanism that allows the type of an object to be determined during program execution. It's depanded RTTI Complete Object Locator. when clmpiling a class that contains a virtual function with RTTI Object.
+
+This RTTI pointer is placed at the address just before the first address of the VF table.

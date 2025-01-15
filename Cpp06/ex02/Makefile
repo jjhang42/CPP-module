@@ -13,7 +13,7 @@ all: $(NAME)
 $(NAME):$(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) $(SANITIZE)
 
-clean: 
+clean:
 	rm -f $(OBJS)
 
 fclean: clean
