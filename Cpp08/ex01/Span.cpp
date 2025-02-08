@@ -33,24 +33,24 @@ void	Span::addNumber( int number )
 	vector.push_back( number );
 }
 
-size_t	Span::shortestSpan( void )
+size_t	Span::shortestSpan( void ) // must be using algorithm
 {
 	if (vector.size() < 2)
 		throw (NotEnoughArguments());
 	std::vector<int>	temp;
 	temp = this->vector;
 	std::sort(temp.begin(), temp.end());
-	size_t	result = SIZE_T_MAX;
+	size_t	result = static_cast<size_t>(std::abs(static_cast<int>(static_cast<size_t>(temp[1]) - static_cast<size_t>(temp[0]))));
 	for (unsigned long	i = 1; i < temp.size(); i++)
 	{
-		size_t	diff = temp[i] - temp[i - 1];
+		size_t	diff = static_cast<size_t>(std::abs(temp[1] - temp[0]));
 		if (diff < result)
 			result = diff;
 	}
-	return (static_cast<size_t>(std::abs(static_cast<int>(result))));
+	return (result);
 }
 
-size_t	Span::longestSpan( void )
+size_t	Span::longestSpan( void ) // must be using algorithm
 {
 	if (vector.size() < 2)
 		throw (NotEnoughArguments());
