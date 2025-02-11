@@ -8,12 +8,18 @@ BitcoinExchange::BitcoinExchange( void )
 
 BitcoinExchange::BitcoinExchange( BitcoinExchange const &copy )
 {
-
+	m = copy.m;
 }
+
 BitcoinExchange	&BitcoinExchange::operator=( BitcoinExchange const &copy )
 {
-
+	if (this != &copy)
+	{
+		this->m = copy.m;
+	}
+	return (*this);
 }
+
 BitcoinExchange::~BitcoinExchange( void )
 {
 
