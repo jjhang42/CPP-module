@@ -6,7 +6,7 @@
 #    By: jjhang <jjhang@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/19 00:52:49 by jjhang            #+#    #+#              #
-#    Updated: 2025/02/06 14:12:35 by jjhang           ###   ########.fr        #
+#    Updated: 2025/02/16 17:07:09 by jjhang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SRCS_DIR = ./
 
 OBJ_DIR = obj
 
-SRCS_FILES = main.cpp
+SRCS_FILES = main.cpp BitcoinExchange.cpp
 
 HEADER = ./
 
