@@ -6,7 +6,7 @@
 #    By: jjhang <jjhang@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/19 00:52:49 by jjhang            #+#    #+#              #
-#    Updated: 2025/02/06 14:12:05 by jjhang           ###   ########.fr        #
+#    Updated: 2025/02/18 22:51:50 by jjhang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SRCS_DIR = ./
 
 OBJ_DIR = obj
 
-SRCS_FILES = main.cpp
+SRCS_FILES = main.cpp RPN.cpp
 
 HEADER = ./
 
