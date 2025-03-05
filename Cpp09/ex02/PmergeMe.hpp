@@ -6,11 +6,14 @@
 # include <list>
 # include <algorithm>
 
-template <class _Container = std::vector<int> >
+# define PAIR std::pair<int, int>
+
+template <template <class, class> class _Container >
 class PmergeMe
 {
 	private:
-		_Container	c;
+		typedef	_Container< std::pair<int, int>, std::allocator< std::pair<int, int > > >	container_type;
+		container_type	c;
 		size_t		comparisonCount;
 		int	cnt;
 
@@ -28,7 +31,6 @@ class PmergeMe
 		~PmergeMe() {}
 
 		/* Container type */
-		typedef _Container container_type;
 		typedef typename container_type::value_type value_type;
 		typedef typename container_type::size_type size_type;
 		typedef typename container_type::reference reference;
@@ -57,7 +59,11 @@ class PmergeMe
 			return c.insert(pos, value);
 		}
 
-		void		push_back(const value_type &value) {
+		void		push_back(const int &value1, const int &value2 ) {
+			c.push_back(PAIR(value1, value2));
+		}
+
+		void	push_back(std::pair<int, int> &value) {
 			c.push_back(value);
 		}
 
@@ -66,34 +72,40 @@ class PmergeMe
 		};
 
 	private:
+		void	consoleLog( std::string const &stage, container_type &MainChain, container_type &SubChain ) {
+			std::clog << stage << std::endl;
+			std::clog << std::endl;
+			std::clog << "MainChain: ";
+			ShowStatus(MainChain);
+			std::clog << std::endl;
+			std::clog << "SubChain : ";
+			ShowStatus(SubChain);
+			std::clog << std::endl;
+		}
+
 		/* empliment method => low bound */
 		iterator	LowBound( container_type &chain, int &value ) {
 			iterator	begin = chain.begin();
 			iterator	end = chain.end();
-			iterator	it;
-
-			size_t	cnt = 0;
-			for ( ; begin != end; ++begin) {
-				cnt++;
-			}
 
 			begin = chain.begin();
-			int	step;
-			while ( cnt > 0) {
-					step = cnt / 2;
-				if ( *begin < value ) {
-					step--;
-					it = ++begin;
+			while ( begin != end ) {
+				iterator	mid = begin;
+				std::advance( mid, std::distance(begin, end) / 2 );
+				if ( *mid < value ) {
+					begin = mid;
+					++begin;
 				}
-				else
-					cnt = step;
+				else {
+					end = mid;
+				}
 			}
-			return (it);
+			return (begin);
 		}
 
 		void	ShowStatus( container_type &c ) const {
 			for (const_iterator it = c.begin(); it != c.end(); ++it) {
-				std::clog << *it << " ";
+				std::clog << it->first << " ";
 			}
 		}
 
@@ -112,29 +124,27 @@ class PmergeMe
 			std::clog << "divide started" << std::endl;
 			container_type	temp = c;
 			size_t	i = 0;
-			for ( ; i < c.size() / 2 ; i += 2 )
+			while ( i + 1 < c.size() )
 			{
 				if (c[i] > c[i + 1]) {
-					MainChain.push_back(c[i]);
-					SubChain.push_back(c[i + 1]);
+					MainChain.push_back(PAIR(c[i].first, c[i].second));
+					SubChain.push_back(PAIR(c[i + 1].first, c[i].second));
 				}
 				else if (c[i] <= c[i + 1]) {
-					MainChain.push_back(c[i + 1]);
-					SubChain.push_back(c[i]);
+					MainChain.push_back(PAIR(c[i + 1].first, c[i].second));
+					SubChain.push_back(PAIR(c[i].first, c[i].second));
 				}
-			std::clog << "parameter: ";
-			ShowStatus(temp);
-			std::clog << std::endl;
-			std::clog << "MainChain: ";
-			ShowStatus(MainChain);
-			std::clog << std::endl;
-			std::clog << "SubChain : ";
-			ShowStatus(SubChain);
-			std::clog << std::endl;
+				i += 2;
 			}
-			if ( c.size() % 2 == 1)
-				MainChain.push_back(c[c.size() - 1]);
+			std::cout << "i : " << i << std::endl;
+			if ( i < c.size() )
+				MainChain.push_back(PAIR(c[i].first, c[i].second));
 
+			consoleLog( "Result: Divide Two Containers", MainChain, SubChain );
+			/* pair to mapping */
+
+
+			consoleLog( "Result: Rearrange pair", MainChain, SubChain );
 			/* Do recursive */
 			MainChain = MergeInsertionSort( MainChain );
 
@@ -147,21 +157,19 @@ class PmergeMe
 			ShowStatus(SubChain);
 			std::clog << std::endl;
 			/* Insertion - binary Style */
-			iterator it = LowBound(MainChain, SubChain[0]);
-			MainChain.insert(it, SubChain[0]);
+
 			return ( MainChain );
 		}
 
 	public:
 		void	ShowStatus( void ) const {
 			for (const_iterator	it = this->c.begin(); it != this->c.end(); ++it) {
-				std::cout << *it << " ";
+				std::cout << it->first << " ";
 			}
 			std::cout << std::endl;
 		}
 
 		void	DoMergeInsertionSort( void ) {
-			cnt = 0;
 			std::cout << "before: ";
 			ShowStatus();
 			this->c = MergeInsertionSort(this->c);

@@ -7,10 +7,11 @@ int main(int argc, char *argv[])
 		return (1);
 	}
 
-	PmergeMe<std::vector<int> >	p;
-	// PmergeMe< std::list<int> >	l;
+	PmergeMe<std::vector>	p;
+	// PmergeMe< std::pair<int, int> >	l;
 	for (int i = 1; i < argc; i++) {
-		p.push_back(std::atoi(argv[i]));
+		std::pair<int, int>	c = std::pair<int, int>(std::atoi(argv[i]), i);
+		p.push_back(c);
 	}
 	std::cout << "container: vector" << std::endl;
 	p.DoMergeInsertionSort();
