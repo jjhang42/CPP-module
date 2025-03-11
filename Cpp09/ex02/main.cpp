@@ -9,9 +9,14 @@ int main(int argc, char *argv[])
 
 	PmergeMe<std::vector>	p;
 	// PmergeMe< std::pair<int, int> >	l;
-	for (int i = 1; i < argc; i++) {
-		std::pair<int, int>	c = std::pair<int, int>(std::atoi(argv[i]), i);
-		p.push_back(c);
+	/* binary */
+	// for (int idx = 1; idx < argc; idx++) {
+	// 	p.push_back(std::atoi(argv[idx]), idx - 1);
+	// }
+	/* js */
+	for (int idx = 1; idx < argc; idx++)
+	{
+		p.push_back(std::atoi(argv[idx]));
 	}
 	std::cout << "container: vector" << std::endl;
 	p.DoMergeInsertionSort();
