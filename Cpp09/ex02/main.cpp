@@ -8,27 +8,26 @@ int main(int argc, char *argv[])
 	}
 
 	PmergeMe<std::vector>	p;
-	// PmergeMe< std::pair<int, int> >	l;
-	/* binary */
-	// for (int idx = 1; idx < argc; idx++) {
-	// 	p.push_back(std::atoi(argv[idx]), idx - 1);
-	// }
-	/* js */
+	PmergeMe<std::list>		l;
 	int	idx = 0;
 	int	cnt = 1;
 	while (cnt < argc)
 	{
+		l.push_back(std::atoi(argv[cnt]), idx);
 		p.push_back(std::atoi(argv[cnt]), idx);
 		cnt++;
 		if (cnt < argc)
 		{
+			l.push_back(std::atoi(argv[cnt]), idx);
 			p.push_back(std::atoi(argv[cnt]), idx);
 			cnt++;
 		}
 		idx++;
 	}
-	std::cout << "container: vector" << std::endl;
-	p.DoMergeInsertionSort();
-
+	std::ostringstream	oss;
+	oss = p.DoMergeInsertionSort(true, "std::vector<int>");
+	std::cout << oss.str();
+	oss = l.DoMergeInsertionSort(false, "std::list<int>");
+	std::cout << oss.str();
 	return (0);
 }

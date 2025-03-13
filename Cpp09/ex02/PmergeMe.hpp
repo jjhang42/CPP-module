@@ -7,6 +7,8 @@
 # include <list>
 # include <algorithm>
 # include <cmath>
+# include <sstream>
+# include <sys/time.h>
 
 # define EMPTY -1
 
@@ -92,7 +94,8 @@ class PmergeMe
 				iterator	mid = begin;
 				std::advance( mid, std::distance(begin, end) / 2 );
 				if ( mid->first < value ) {
-					begin = mid + 1;
+					begin = mid;
+					++begin;
 				}
 				else {
 					end = mid;
@@ -147,8 +150,10 @@ class PmergeMe
 					max = subsize;
 				while (max > min)
 				{
-					iterator	it = LowBound(MainChain.begin(),getIteratorInPair(MainChain, SubChain[max - 1]), SubChain[max - 1].first);
-					MainChain.insert(it, SubChain[max - 1]);
+					iterator	subit = SubChain.begin();
+					std::advance(subit, max - 1);
+					iterator	it = LowBound(MainChain.begin(),getIteratorInPair(MainChain, *subit), subit->first);
+					MainChain.insert(it, *subit);
 					max--;
 				}
 				idx++;
@@ -186,40 +191,38 @@ class PmergeMe
 		/* Merge Insertion Sort */
 		container_type	MergeInsertionSort( container_type &c ) {
  			/* Escape Condition */
-			if (c.size() <= 1)
-			{
-				std::clog << "escape from recursive!" << std::endl;
+			if (c.size() <= 1) {
 				return (c);
 			}
 			container_type	MainChain;
 			container_type	SubChain;
 			/* Divide */
 			size_t	i = 0;
-			while (i + 1 < c.size())
-			{
-				if (c[i].first > c[i + 1].first) {
-					MainChain.push_back(std::pair<int, int>(c[i].first, i));
-					SubChain.push_back(std::pair<int, int>(c[i + 1].first, i));
+			iterator	it = c.begin();
+			while (i + 1 < c.size()) {
+				iterator	next = it;
+				std::advance(next, 1);
+				if (it->first > next->first) {
+					MainChain.push_back(std::pair<int, int>(it->first, i));
+					SubChain.push_back(std::pair<int, int>(next->first, i));
 				}
 				else {
-					MainChain.push_back(std::pair<int, int>(c[i + 1].first, i));
-					SubChain.push_back(std::pair<int, int>(c[i].first, i));
+					MainChain.push_back(std::pair<int, int>(next->first, i));
+					SubChain.push_back(std::pair<int, int>(it->first, i));
 				}
 				comparisonCnt++;
+				std::advance(it, 2);
 				i += 2;
 			}
 			if (i < c.size())
-				SubChain.push_back(c[i]);
+				SubChain.push_back(*it);
 			MainChain = MergeInsertionSort( MainChain );
-			consoleLog("merge result:", MainChain, SubChain);
 			/* pairing */
 			SubChain = setPairing( MainChain, SubChain );
 
-			consoleLog("pairing", MainChain, SubChain);
 			/* Insertion - binary Style */
 			MainChain = JacobsthalInsertionPhase( MainChain, SubChain );
 			MainChain = recoverIndex(MainChain, c);
-			consoleLog("insertion result: ", MainChain, SubChain);
 
 			return ( MainChain );
 		}
@@ -243,12 +246,6 @@ class PmergeMe
 				if (js >= c.size())
 					break ;
 			}
-			std::vector<int>::iterator it	= jacobsthalSequence.begin();
-			for ( ; it != jacobsthalSequence.end(); ++it)
-			{
-				std::cout << *it << " ";
-			}
-			std::cout << std::endl;
 		}
 
 	public:
@@ -259,15 +256,35 @@ class PmergeMe
 			std::cout << std::endl;
 		}
 
-		void	DoMergeInsertionSort( void ) {
+		std::ostringstream	DoMergeInsertionSort( int flag, std::string	containerType ) {
+			struct timeval	start, end;
+			std::ostringstream	oss;
+
+			gettimeofday(&start, NULL);
+			if (flag)
+			{
+				oss << "before: ";
+				for (const_iterator	it = this->c.begin(); it != this->c.end(); ++it) {
+					oss << it->first << " ";
+				}
+				oss << std::endl;
+			}
 			makeJacobsthalSequence();
-			std::cout << "before: ";
-			ShowStatus();
 			this->c = MergeInsertionSort( this->c );
-			std::cout << "after: ";
-			ShowStatus();
-			std::cout << "Numbers: " << max << std::endl;
-			std::cout << "Comparision Count: " << comparisonCnt << std::endl;
+			gettimeofday(&end, NULL);
+			if (flag)
+			{
+				oss << "after: ";
+				for (const_iterator	it = this->c.begin(); it != this->c.end(); ++it) {
+					oss << it->first << " ";
+				}
+				oss << std::endl;
+			}
+			long	seconds = end.tv_sec - start.tv_sec;
+			long	micros = end.tv_usec - start.tv_usec;
+			long	totalTime = seconds * 1000000 + micros;
+			oss << "Time to process a range of " << max << " elements with " << containerType << ":: " << totalTime << " us" << std::endl;
+			return (oss);
 		}
 };
 
