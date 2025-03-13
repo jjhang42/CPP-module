@@ -69,7 +69,7 @@ class PmergeMe
 		}
 
 		void	push_back( const int &value, const int &index ) {
-			max = index + 1;
+			max++;
 			c.push_back(std::pair<int, int>(value, index));
 		}
 
@@ -78,10 +78,12 @@ class PmergeMe
 		}
 
 	private:
-		void	consoleLog( std::string const &stage, container_type &Chain ) {
+		void	consoleLog( std::string const &stage, container_type &Main, container_type &Sub ) {
 			std::clog << stage << std::endl;
-			std::clog << "[CHAIN]" << std::endl;
-			ShowStatus(Chain);
+			std::clog << "[MAIN]" << std::endl;
+			ShowStatus(Main);
+			std::clog << "[SUB]" << std::endl;
+			ShowStatus(Sub);
 		}
 
 		/* impliment method => low bound */
@@ -101,39 +103,14 @@ class PmergeMe
 		}
 
 		void	ShowStatus( container_type &c ) const {
-			std::clog << "Main: ";
 			for (const_iterator it = c.begin(); it != c.end(); ++it) {
 				std::clog << it->first << " ";
-			}
-			std::clog << std::endl;
-			std::clog << "_Sub: ";
-			for (const_iterator it = c.begin(); it != c.end(); ++it) {
-				std::clog << it->second << " ";
 			}
 			std::clog << std::endl;
 		}
 
 		int	getSubIndex( int depth, int MainChainIdx ) {
 			return ( MainChainIdx / static_cast<int>(std::pow(2, depth)));
-		}
-
-		std::pair<int, int>	SplitPair( container_type &c, container_type &chain, int idx) {
-			std::pair<int, int>	temp;
-
-			temp.first = c[idx].second;
-			temp.second = EMPTY;
-			c[idx].second = EMPTY;
-			int	num = c[idx].first;
-			iterator	it = chain.begin();
-			for (; it != chain.end(); ++it) {
-				if (it->first == num) {
-						it->second = EMPTY;
-					break;
-				}
-			}
-			if (it != chain.end() && it->first == EMPTY && it->second == EMPTY)
-				chain.erase(it);
-			return (temp);
 		}
 
 		unsigned int	getSize( iterator begin, iterator end ) {
@@ -148,40 +125,64 @@ class PmergeMe
 			return (Csize);
 		}
 
-		container_type	JacobsthalInsertionPhase( container_type &c ) {
-			container_type	Chain = c;
-			std::pair<int, int>	temp;
-			unsigned int	size = getSize(c.begin(), c.end());
-			/*  pairing */
-			temp = SplitPair(c, Chain, 0);
-			Chain.insert(Chain.begin(), temp);
-			consoleLog("++insertion++", Chain );
+		iterator	getIteratorInPair( container_type &MainChain, std::pair<int, int> &src ) {
+			iterator	it = MainChain.begin();
+			int			idx = src.second;
+			for ( ; it != MainChain.end(); ++it ) {
+				if (idx == it->second)
+					return (it);
+			}
+			return (MainChain.end());
+		}
 
+		container_type	JacobsthalInsertionPhase( container_type &MainChain, container_type &SubChain ) {
+			MainChain.insert(MainChain.begin(), *SubChain.begin());
 			unsigned int	idx = 3;
-			unsigned int	curSize = 2;
-			while ( idx < jacobsthalSequence.size() && curSize < size)
+			while ( idx < jacobsthalSequence.size() )
 			{
-				unsigned int	maxNum = jacobsthalSequence[idx];
-				unsigned int	Csize = c.size();
-				if (maxNum > Csize)
-					maxNum = Csize;
-				unsigned int	minNum = jacobsthalSequence[idx - 1];
-				std::cout << "MAX: " << maxNum << std::endl;
-				std::cout << "MIN: " << minNum << std::endl;
-				while (maxNum > minNum)
+				unsigned int	max = jacobsthalSequence[ idx ];
+				unsigned int	min = jacobsthalSequence[ idx - 1 ];
+				unsigned int	subsize = SubChain.size();
+				if (max > subsize)
+					max = subsize;
+				while (max > min)
 				{
-					temp = SplitPair(c, Chain, maxNum - 1);
-					iterator it = LowBound(Chain.begin(), Chain.end(), temp.first);
-					Chain.insert(it, temp);
-					maxNum--;
-					curSize++;
+					iterator	it = LowBound(MainChain.begin(),getIteratorInPair(MainChain, SubChain[max - 1]), SubChain[max - 1].first);
+					MainChain.insert(it, SubChain[max - 1]);
+					max--;
 				}
 				idx++;
 			}
-			return (Chain);
+			return (MainChain);
 		}
 
+		container_type	setPairing( container_type &MainChain, container_type &SubChain ) {
+			container_type	NewSubChain;
+			for (iterator	it = MainChain.begin(); it != MainChain.end() ; ++it ) {
+				for (iterator subit = SubChain.begin(); subit != SubChain.end(); ++subit ) {
+					if ( subit->second == it->second ) {
+						NewSubChain.push_back(*subit);
+						SubChain.erase(subit);
+						break ;
+					}
+				}
+			}
+			if (SubChain.size() != 0)
+				NewSubChain.push_back(*SubChain.begin());
+			return (NewSubChain);
+		}
 
+		container_type	recoverIndex( container_type &dst, container_type &src ) {
+			for (iterator	dstit = dst.begin(); dstit != dst.end() ; ++dstit ) {
+				for (iterator srcit = src.begin(); srcit != src.end(); ++srcit ) {
+					if ( dstit->first == srcit->first ) {
+						dstit->second = srcit->second;
+						break ;
+					}
+				}
+			}
+			return (dst);
+		}
 		/* Merge Insertion Sort */
 		container_type	MergeInsertionSort( container_type &c ) {
  			/* Escape Condition */
@@ -190,30 +191,37 @@ class PmergeMe
 				std::clog << "escape from recursive!" << std::endl;
 				return (c);
 			}
-			container_type	Chain;
+			container_type	MainChain;
+			container_type	SubChain;
 			/* Divide */
 			size_t	i = 0;
 			while (i + 1 < c.size())
 			{
 				if (c[i].first > c[i + 1].first) {
-					Chain.push_back(std::pair<int,int>(c[i].first, c[i + 1].first));
+					MainChain.push_back(std::pair<int, int>(c[i].first, i));
+					SubChain.push_back(std::pair<int, int>(c[i + 1].first, i));
 				}
 				else {
-					Chain.push_back(std::pair<int,int>(c[i + 1].first, c[i].first));
+					MainChain.push_back(std::pair<int, int>(c[i + 1].first, i));
+					SubChain.push_back(std::pair<int, int>(c[i].first, i));
 				}
 				comparisonCnt++;
 				i += 2;
 			}
 			if (i < c.size())
-				Chain.push_back(std::pair<int,int>(EMPTY, c[i].first));
-			Chain = MergeInsertionSort( Chain );
+				SubChain.push_back(c[i]);
+			MainChain = MergeInsertionSort( MainChain );
+			consoleLog("merge result:", MainChain, SubChain);
+			/* pairing */
+			SubChain = setPairing( MainChain, SubChain );
+
+			consoleLog("pairing", MainChain, SubChain);
 			/* Insertion - binary Style */
-			consoleLog("divide result", Chain);
-			consoleLog("divide result??", c);
-			std::cout << std::endl;
-			/* Do recursive */
-			Chain = JacobsthalInsertionPhase( Chain );
-			return ( Chain );
+			MainChain = JacobsthalInsertionPhase( MainChain, SubChain );
+			MainChain = recoverIndex(MainChain, c);
+			consoleLog("insertion result: ", MainChain, SubChain);
+
+			return ( MainChain );
 		}
 
 		/* J_n = J_{n-1} + 2J_{n-2} */
