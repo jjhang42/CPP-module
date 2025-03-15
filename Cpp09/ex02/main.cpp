@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
 		}
 		idx++;
 	}
-	std::ostringstream	oss;
-	oss = p.DoMergeInsertionSort(true, "std::vector<int>");
-	std::cout << oss.str();
-	oss = l.DoMergeInsertionSort(false, "std::list<int>");
-	std::cout << oss.str();
+	std::string	str;
+	str = p.DoMergeInsertionSort(true, "std::vector<int>");
+	std::cout << str;
+	str = l.DoMergeInsertionSort(false, "std::list<int>");
+	std::cout << str;
 	return (0);
 }

@@ -110,6 +110,10 @@ class PmergeMe
 				std::clog << it->first << " ";
 			}
 			std::clog << std::endl;
+			for (const_iterator it = c.begin(); it != c.end(); ++it) {
+				std::clog << it->second << " ";
+			}
+			std::clog << std::endl;
 		}
 
 		int	getSubIndex( int depth, int MainChainIdx ) {
@@ -215,15 +219,17 @@ class PmergeMe
 				i += 2;
 			}
 			if (i < c.size())
-				SubChain.push_back(*it);
+				SubChain.push_back(std::pair<int, int>(it->first, i));
+			// consoleLog("merge done", MainChain, SubChain);
 			MainChain = MergeInsertionSort( MainChain );
 			/* pairing */
 			SubChain = setPairing( MainChain, SubChain );
 
+			// consoleLog("pairing", MainChain, SubChain);
 			/* Insertion - binary Style */
 			MainChain = JacobsthalInsertionPhase( MainChain, SubChain );
 			MainChain = recoverIndex(MainChain, c);
-
+			// consoleLog("insertion done", MainChain, SubChain);
 			return ( MainChain );
 		}
 
@@ -256,7 +262,7 @@ class PmergeMe
 			std::cout << std::endl;
 		}
 
-		std::ostringstream	DoMergeInsertionSort( int flag, std::string	containerType ) {
+		std::string	DoMergeInsertionSort( int flag, std::string	containerType ) {
 			struct timeval	start, end;
 			std::ostringstream	oss;
 
@@ -284,7 +290,7 @@ class PmergeMe
 			long	micros = end.tv_usec - start.tv_usec;
 			long	totalTime = seconds * 1000000 + micros;
 			oss << "Time to process a range of " << max << " elements with " << containerType << ":: " << totalTime << " us" << std::endl;
-			return (oss);
+			return (oss.str());
 		}
 };
 
