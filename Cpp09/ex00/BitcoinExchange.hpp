@@ -8,6 +8,8 @@
 # include <cmath>
 # include <map>
 
+# define ERROR -1
+
 class BitcoinExchange
 {
 	private:

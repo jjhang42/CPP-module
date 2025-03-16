@@ -30,13 +30,14 @@ int	main( int argc, char *argv[] )
 	BitcoinExchange	bit;
 
 	if (checkParameter(argc))
-		return (1);
-	if (IsExtension( argv[1], ".txt") == false)
-		return (1);
+		return (ERROR);
+	if (IsExtension( argv[1], ".txt") != true || IsExtension( argv[1], ".csv") != true)
+		return (ERROR);
 	std::ifstream	file("data.csv");
 	if (!file)
 	{
 		std::cerr << "Error: file open failed!" << std::endl;
+		return (ERROR);
 	}
 	std::string	line;
 	while (std::getline(file, line))
@@ -48,6 +49,7 @@ int	main( int argc, char *argv[] )
 	if (!input)
 	{
 		std::cerr << "Error: file open failed!" << std::endl;
+		return (ERROR);
 	}
 	std::getline(input, line);
 	while (std::getline(input, line))
