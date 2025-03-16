@@ -40,7 +40,6 @@ static int	getDate(char **endptr)
 	date += (std::strtol(*endptr, endptr, 10) * 100);
 	mvptr(endptr, '-');
 	date += std::strtol(*endptr, endptr, 10);
-
 	return (date);
 }
 
@@ -104,27 +103,22 @@ static bool IsInvalidDate( int date )
 	}
 	if (daymax[getMonth(date)] < getDay(date))
 		return (false);
+	if (getYear(date) < 2009 || (getYear(date) <= 2009 && getMonth(date) == 1 && getDay(date) == 1))
+		return (false);
 	return (true);
 }
 
 double	BitcoinExchange::getMarketValue( double num, int date )
 {
-	std::map<int, ssize_t>::iterator it = data.find(date);
-	while (true)
+	std::map<int, ssize_t>::iterator it = data.lower_bound(date);
+	if (it == data.end() || it->first > date)
 	{
-		if (it != data.end())
-			break;
-		else if (it == data.begin())
+		if (it == data.begin())
 			return (0);
-		else
-		{
-			date--;
-			it = data.find(date);
-		}
+		--it;
 	}
 	double	temp = (it->second * 0.01);
 	num = 0;
-	// std::cout << num << " | " << date << " | " << it->second << std::endl;
 	return (std::round(temp * 100) / 100);
 }
 
