@@ -31,7 +31,7 @@ int	main( int argc, char *argv[] )
 
 	if (checkParameter(argc))
 		return (ERROR);
-	if (IsExtension( argv[1], ".txt") != true || IsExtension( argv[1], ".csv") != true)
+	if (IsExtension( argv[1], ".txt") == false)
 		return (ERROR);
 	std::ifstream	file("data.csv");
 	if (!file)
